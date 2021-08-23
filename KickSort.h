@@ -422,30 +422,45 @@ void KickSort<Type>::combSort(Type input[], const uint16_t samples, KickSort_Dir
 //samples		number of samples in the array
 //
 //This orders the array in ascending order.
-//From: https://forum.arduino.cc/index.php?topic=280486.0
+//
+//From: https://en.wikipedia.org/wiki/Shellsort and
+//https://rosettacode.org/wiki/Sorting_algorithms/Shell_sort#C
+//
+//Note: A previous version of this routine came from
+//https://forum.arduino.cc/index.php?topic=280486.0 which implements shell sort
+//incorrectly. It seems to reduce to a very inefficient version of bubble sort.
+//
+//For the elements in examples/EXAMPLE05_ShellSort/:
+//* N=100:
+//  * Old version: 6224 micros
+//  * New version: 1856 micros
+//on a 16 MHz AVR.
+//N=200:
+//  * Old version: 38808 micros
+//  * New version: 4776 micros
+//
+//This is strong evidence that the old version was an O(N^2) algorithm or worse.
+//The correct version of shell sort should be somewhere around O(N^1.5).
 template<typename Type>
 void KickSort<Type>::shellSort(Type input[], const uint16_t samples)
 {
 	uint16_t i;
 	uint16_t d = samples;
-	uint8_t flag = 1;
 	Type temp;
-	
-	
-	while( flag || (d > 1)) // boolean flag (true when not equal to 0)
+
+	while (d > 1)
 	{
-		flag = 0; // reset flag to 0 to check for future swaps
 		d = (d+1) / 2;
-		
-		for (i = 0; i < (samples - d); i++)
+		for (i = d; i < samples; i++)
 		{
-			if (input[i + d] < input[i])
+			temp = input[i];
+			uint16_t j;
+			for (j = i; j >= d; j -= d)
 			{
-				temp = input[i + d]; // swap positions i+d and i
-				input[i + d] = input[i];
-				input[i] = temp;
-				flag = 1; // tells swap has occurred
+				if (input[j - d] <= temp) break;
+				input[j] = input[j - d];
 			}
+			input[j] = temp;
 		}
 	}
 }
@@ -459,7 +474,25 @@ void KickSort<Type>::shellSort(Type input[], const uint16_t samples)
 //
 //This orders the array in ascending or descending order based on the
 //KickSort_Dir parameter.
-//From: https://forum.arduino.cc/index.php?topic=280486.0
+//
+//From: https://en.wikipedia.org/wiki/Shellsort and
+//https://rosettacode.org/wiki/Sorting_algorithms/Shell_sort#C
+//
+//Note: A previous version of this routine came from
+//https://forum.arduino.cc/index.php?topic=280486.0 which implements shell sort
+//incorrectly. It seems to reduce to a very inefficient version of bubble sort.
+//
+//For the elements in examples/EXAMPLE05_ShellSort/:
+//* N=100:
+//  * Old version: 6224 micros
+//  * New version: 1856 micros
+//on a 16 MHz AVR.
+//N=200:
+//  * Old version: 38808 micros
+//  * New version: 4776 micros
+//
+//This is strong evidence that the old version was an O(N^2) algorithm or worse.
+//The correct version of shell sort should be somewhere around O(N^1.5).
 template<typename Type>
 void KickSort<Type>::shellSort(Type input[], const uint16_t samples, KickSort_Dir d)
 {
@@ -468,28 +501,24 @@ void KickSort<Type>::shellSort(Type input[], const uint16_t samples, KickSort_Di
 	{
 		uint16_t i;
 		uint16_t d = samples;
-		uint8_t flag = 1;
 		Type temp;
 		
-		
-		while( flag || (d > 1)) // boolean flag (true when not equal to 0)
+		while (d > 1)
 		{
-			flag = 0; // reset flag to 0 to check for future swaps
 			d = (d+1) / 2;
-			
-			for (i = 0; i < (samples - d); i++)
+			for (i = d; i < samples; i++)
 			{
-				if (input[i + d] > input[i])
+				temp = input[i];
+				uint16_t j;
+				for (j = i; j >= d; j -= d)
 				{
-					temp = input[i + d]; // swap positions i+d and i
-					input[i + d] = input[i];
-					input[i] = temp;
-					flag = 1; // tells swap has occurred
+					if (input[j - d] >= temp) break;
+					input[j] = input[j - d];
 				}
+				input[j] = temp;
 			}
 		}
 	}
-	
 }
 
 
